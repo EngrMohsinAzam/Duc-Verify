@@ -1,0 +1,14 @@
+# Binaries
+*.exe
+/api
+
+# Env (keep .env.example)
+.env
+.env.local
+
+# Go
+vendor/
+
+# IDE
+.idea/
+.vscode/
