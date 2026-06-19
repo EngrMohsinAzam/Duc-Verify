@@ -57,7 +57,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	store, err := storage.NewS3Storage(ctx, storage.Config{
+	store, err := storage.NewStore(ctx, cfg.StorageDriver, db, storage.Config{
 		Endpoint:  cfg.S3Endpoint,
 		Bucket:    cfg.S3Bucket,
 		AccessKey: cfg.S3AccessKey,
@@ -161,7 +161,7 @@ func main() {
 	}
 }
 
-func readyHandler(db *gorm.DB, store *storage.S3Storage) gin.HandlerFunc {
+func readyHandler(db *gorm.DB, store storage.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := database.Ping(db); err != nil {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "not_ready", "db": "down"})

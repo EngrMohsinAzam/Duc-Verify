@@ -39,13 +39,13 @@ var allowedMIME = map[string]struct{}{
 
 type Service struct {
 	repo           *Repository
-	storage        *storage.S3Storage
+	storage        storage.Store
 	audit          *audit.Logger
 	frontendURL    string
 	maxUploadBytes int64
 }
 
-func NewService(repo *Repository, store *storage.S3Storage, auditLogger *audit.Logger, frontendURL string, maxUploadBytes int64) *Service {
+func NewService(repo *Repository, store storage.Store, auditLogger *audit.Logger, frontendURL string, maxUploadBytes int64) *Service {
 	return &Service{
 		repo:           repo,
 		storage:        store,

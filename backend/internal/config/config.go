@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/docverify/backend/pkg/storage"
 	"github.com/joho/godotenv"
 )
 
@@ -24,6 +25,7 @@ type Config struct {
 	S3SecretKey     string
 	S3Region        string
 	S3UseSSL        bool
+	StorageDriver   storage.Driver
 	MaxUploadBytes  int64
 	VerifyRateLimit float64
 	VerifyRateBurst int
@@ -46,6 +48,7 @@ func Load() (*Config, error) {
 		S3SecretKey:     getEnv("S3_SECRET_KEY", "minioadmin"),
 		S3Region:        getEnv("S3_REGION", "us-east-1"),
 		S3UseSSL:        getEnvBool("S3_USE_SSL", false),
+		StorageDriver:   storage.Driver(strings.ToLower(getEnv("STORAGE_DRIVER", "s3"))),
 		MaxUploadBytes:  int64(getEnvInt("MAX_UPLOAD_MB", 25)) * 1024 * 1024,
 		VerifyRateLimit: float64(getEnvInt("VERIFY_RATE_LIMIT", 30)),
 		VerifyRateBurst: getEnvInt("VERIFY_RATE_BURST", 10),
@@ -61,6 +64,9 @@ func Load() (*Config, error) {
 	}
 	if cfg.JWTSecret == "" {
 		return nil, fmt.Errorf("JWT_SECRET is required")
+	}
+	if cfg.StorageDriver != storage.DriverS3 && cfg.StorageDriver != storage.DriverDB {
+		return nil, fmt.Errorf("STORAGE_DRIVER must be s3 or db")
 	}
 	if len(cfg.JWTSecret) < 16 {
 		return nil, fmt.Errorf("JWT_SECRET must be at least 16 characters")

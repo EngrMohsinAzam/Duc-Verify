@@ -117,7 +117,11 @@ func (s *S3Storage) UploadDocument(ctx context.Context, orgID uuid.UUID, filenam
 	return key, url, err
 }
 
-func (s *S3Storage) DownloadFile(ctx context.Context, key string) ([]byte, error) {
+func (s *S3Storage) DownloadFile(ctx context.Context, ref string) ([]byte, error) {
+	key := RefToKey(ref, s.bucket)
+	if key == "" {
+		return nil, fmt.Errorf("invalid storage reference")
+	}
 	out, err := s.client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(key),

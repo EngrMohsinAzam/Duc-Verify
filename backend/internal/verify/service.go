@@ -15,11 +15,11 @@ import (
 type Service struct {
 	docRepo *document.Repository
 	audit   *audit.Logger
-	store   *storage.S3Storage
+	store   storage.Store
 	bucket  string
 }
 
-func NewService(docRepo *document.Repository, auditLogger *audit.Logger, store *storage.S3Storage, bucket string) *Service {
+func NewService(docRepo *document.Repository, auditLogger *audit.Logger, store storage.Store, bucket string) *Service {
 	return &Service{
 		docRepo: docRepo,
 		audit:   auditLogger,
@@ -104,12 +104,7 @@ func (s *Service) GetPreview(ctx context.Context, shortID string) (*PreviewFile,
 		return nil, err
 	}
 
-	key := storage.KeyFromURL(doc.S3URL, s.bucket)
-	if key == "" {
-		return nil, errors.New("invalid storage key")
-	}
-
-	data, err := s.store.DownloadFile(ctx, key)
+	data, err := s.store.DownloadFile(ctx, doc.S3URL)
 	if err != nil {
 		return nil, err
 	}
